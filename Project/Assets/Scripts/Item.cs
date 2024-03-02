@@ -10,6 +10,7 @@ public class Item : MonoBehaviour, IInteractable {
     private IItemObjectParent itemObjectParent; // this is so the item knows which structure/IItemObjectParent it belongs to 
 
     //just adding a comment here for the sake of it to test GitHub
+    //ok adding another to test out changes
    
     public ItemSO GetItemSO() {
         return itemSO;
