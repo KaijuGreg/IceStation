@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerInteract : MonoBehaviour, IItemObjectParent {
+public class Player : MonoBehaviour, IItemObjectParent {
 
     [SerializeField] Transform itemHoldLocation;
     private Item item;
@@ -11,7 +11,7 @@ public class PlayerInteract : MonoBehaviour, IItemObjectParent {
         if (Input.GetKeyDown(KeyCode.E)) {
             IInteractable interactable = GetInteractableObject();
             if (interactable != null) { 
-                    interactable.Interact(transform);
+                    interactable.Interact(this);
             }
         }    
     }

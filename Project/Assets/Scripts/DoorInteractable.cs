@@ -6,7 +6,7 @@ public class DoorInteractable : MonoBehaviour, IInteractable {
 
     private Animator animator;
     private bool isOpen;
-    //you can delete this comment
+    
     private void Awake() {
         
         animator = GetComponent<Animator>();
@@ -20,7 +20,7 @@ public class DoorInteractable : MonoBehaviour, IInteractable {
 
     }
 
-    public void Interact(Transform interactorTransform) {
+    public void Interact(Player player) {
        ToggleDoor();    
     }
 

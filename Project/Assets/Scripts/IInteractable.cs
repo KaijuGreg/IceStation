@@ -4,7 +4,7 @@ using UnityEngine;
 
 public interface IInteractable {
 
-    void Interact(Transform interactorTransform);
+    void Interact(Player player);
     Transform GetTransform(); // this is used for determining how close one Interactable is compared to another
     
 }

@@ -2,15 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Item : MonoBehaviour, IInteractable {
+public class Item : MonoBehaviour {
 
 
     [SerializeField] private ItemSO itemSO;
 
     private IItemObjectParent itemObjectParent; // this is so the item knows which structure/IItemObjectParent it belongs to 
 
-    //just adding a comment here for the sake of it to test GitHub
-    //ok adding another to test out changes
    
     public ItemSO GetItemSO() {
         return itemSO;
@@ -20,13 +18,16 @@ public class Item : MonoBehaviour, IInteractable {
        return transform;
     }
 
-    public void Interact(Transform interactorTransform) {
 
-        SetItemObjectParent(interactorTransform.gameObject.GetComponent<IItemObjectParent>());
+    /*
+   public void Interact(Player player) {
 
-        Debug.Log("Interacting with the: " + itemSO.itemName);
+       SetItemObjectParent(player.gameObject.GetComponent<IItemObjectParent>());
 
-    }
+       Debug.Log("Interacting with the: " + itemSO.itemName);
+
+   }
+  */
 
     //this allows the item to manage and tell the parent structure where the item belongs to...
     public void SetItemObjectParent(IItemObjectParent itemObjectParent) { // here we tell the item, the structure passed through, is now structure it is attached to
@@ -43,7 +44,7 @@ public class Item : MonoBehaviour, IInteractable {
             Debug.Log("IItemObjectParent already has an item!");
         }
 
-        //3. we tell the new structure it now has this item
+        //3. we tell the new structure/parent it now has this item
         itemObjectParent.SetItem(this);
 
         //4. we visually move the Item to the Location Point

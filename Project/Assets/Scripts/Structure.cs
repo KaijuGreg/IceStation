@@ -3,16 +3,15 @@ using System.Collections.Generic;
 using UnityEditor.UIElements;
 using UnityEngine;
 
-public class Structure : MonoBehaviour, IItemObjectParent {
+public class Structure : MonoBehaviour, IItemObjectParent, IInteractable {
 
     [SerializeField] private Transform itemHoldLocation;
     [SerializeField] private ItemSO itemSO;
       
     private Item item;
 
+     
         
-
-    
 
     private ItemSO GetItemSO() {
         return itemSO;
@@ -39,6 +38,25 @@ public class Structure : MonoBehaviour, IItemObjectParent {
         return item != null; //this says if it is NOT null, return the item.
     }
 
-    
+    public void Interact(Player player) {
+        if (item == null) {
+            //No item here
+            Debug.Log("There is no item here.");
+            if (player.HasItem()) {
+                player.GetItem().SetItemObjectParent(this);
+            }
 
+        }else {
+            //There is an item here
+            Debug.Log("I'm holding " + item.GetComponent<Item>().GetItemSO().itemName);
+            item.SetItemObjectParent(player);
+        }
+
+        
+
+    }
+
+    public Transform GetTransform() {
+        return transform;
+    }
 }

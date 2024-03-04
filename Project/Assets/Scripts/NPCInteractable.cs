@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class NPCInteractable : MonoBehaviour, IInteractable {
   
-    public void Interact(Transform interactorTransform) {
+    public void Interact(Player player) {
 
         Debug.Log("Interact NPC!");
     }

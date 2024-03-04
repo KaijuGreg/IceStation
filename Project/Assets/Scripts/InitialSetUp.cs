@@ -9,7 +9,7 @@ public class InitialSetUp : MonoBehaviour {
     [SerializeField] private Structure Table03;
     [SerializeField] private ItemSO keyPink;
     [SerializeField] private ItemSO keyBlue;
-    [SerializeField] private PlayerInteract player;
+    [SerializeField] private Player player;
 
     [SerializeField] private bool testing;
 
@@ -30,7 +30,7 @@ public class InitialSetUp : MonoBehaviour {
 
         if (testing && Input.GetKeyDown(KeyCode.T)) { 
             
-            Table01.GetItem().GetComponent<Item>().SetItemObjectParent(player);
+            Table01.GetItem().GetComponent<Item>().SetItemObjectParent(Table03);
         
         }
     }
