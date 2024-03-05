@@ -51,6 +51,7 @@ public class Item : MonoBehaviour {
         transform.parent = itemObjectParent.GetItemHoldLocation(); // this assigns the items to it's new location so that it actually visually moves
         
         transform.localPosition = Vector3.zero;
+        transform.localRotation = Quaternion.identity;
     }
 
     public IItemObjectParent GetItemObjectParent() {

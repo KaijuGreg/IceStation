@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
-public class SwitchInteractable : MonoBehaviour,IInteractable, IItemObjectParent {
+public class SwitchInteractable : MonoBehaviour,IInteractable,IItemObjectParent {
 
     [SerializeField] private MeshRenderer buttonLightMeshRenderer;
     [SerializeField] private Material buttonOnMaterial;
@@ -12,43 +13,31 @@ public class SwitchInteractable : MonoBehaviour,IInteractable, IItemObjectParent
 
     private bool isSwitchOff;
 
-    private void SetSwitchColourOff() {
-        buttonLightMeshRenderer.material = buttonOffMaterial;
-    }
-
-    private void SetSwitchColourOn() {
-        buttonLightMeshRenderer.material = buttonOnMaterial;
-    }
-
-    private void ToggleColour() {
-        isSwitchOff = !isSwitchOff;
-        if (isSwitchOff) {
-            SetSwitchColourOff();
-        }else {
-            SetSwitchColourOn();
-        }
-
-    }
-
-    public void PushButton() {
-        ToggleColour();
-    }
+    public event EventHandler DoorAccessGranted;
 
     public void Interact(Player player) {
 
-        if (item == null) {
-            //No item here
-            Debug.Log("There is no item here.");
-            if (player.HasItem()) {
-                player.GetItem().SetItemObjectParent(this);
+        if (!player.HasItem()) { // check to see if player is holding item. Player not holding item.
+
+            GetItem().SetItemObjectParent(player); // this gives the item to the player
+
+        }
+        else {  // player is holding item
+            if (item == null) { //There is an NO item here on structure
+                if (player.HasItem()) {
+                    if (player.GetItem() is ItemAccessKey) { // this tests for ACCESS KEY here!
+                        player.GetItem().SetItemObjectParent(this); // this places the item on the structure
+                        DoorAccessGranted?.Invoke(this, EventArgs.Empty);   
+                    }else {
+                        Debug.Log("Wrong key");
+                    }
+                    
+                }
+
             }
 
         }
-        else {
-            //There is an item here
-            Debug.Log("I'm holding " + item.GetComponent<Item>().GetItemSO().itemName);
-            item.SetItemObjectParent(player);
-        }
+
 
         PushButton();
         Debug.Log("Button is PUSHED");
@@ -62,6 +51,7 @@ public class SwitchInteractable : MonoBehaviour,IInteractable, IItemObjectParent
     public Transform GetItemHoldLocation() {
         return itemHoldLocation;
     }
+
 
     public void SetItem(Item item) {
         this.item = item;
@@ -78,4 +68,28 @@ public class SwitchInteractable : MonoBehaviour,IInteractable, IItemObjectParent
     public bool HasItem() {
         return item != null;
     }
+
+    private void SetSwitchColourOff() {
+        buttonLightMeshRenderer.material = buttonOffMaterial;
+    }
+
+    private void SetSwitchColourOn() {
+        buttonLightMeshRenderer.material = buttonOnMaterial;
+    }
+
+    private void ToggleColour() {
+        isSwitchOff = !isSwitchOff;
+        if (isSwitchOff) {
+            SetSwitchColourOff();
+        }
+        else {
+            SetSwitchColourOn();
+        }
+
+    }
+
+    public void PushButton() {
+        ToggleColour();
+    }
+
 }

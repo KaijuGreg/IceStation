@@ -39,21 +39,22 @@ public class Structure : MonoBehaviour, IItemObjectParent, IInteractable {
     }
 
     public void Interact(Player player) {
-        if (item == null) {
-            //No item here
-            Debug.Log("There is no item here.");
-            if (player.HasItem()) {
-                player.GetItem().SetItemObjectParent(this);
+        if (!player.HasItem()) { // check to see if player is holding item, Player not holding item.
+
+               GetItem().SetItemObjectParent(player); // this gives the item to the player
+
+        } else {  // player is holding item
+            if (item == null) { //There is an NO item here on structure
+                if (player.HasItem()) {
+                    player.GetItem().SetItemObjectParent(this); // this places the item on the structure
+                }
+
             }
 
-        }else {
-            //There is an item here
-            Debug.Log("I'm holding " + item.GetComponent<Item>().GetItemSO().itemName);
-            item.SetItemObjectParent(player);
         }
 
-        
-
+       
+                
     }
 
     public Transform GetTransform() {
