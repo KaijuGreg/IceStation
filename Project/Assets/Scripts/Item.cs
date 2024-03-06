@@ -18,17 +18,7 @@ public class Item : MonoBehaviour {
        return transform;
     }
 
-
-    /*
-   public void Interact(Player player) {
-
-       SetItemObjectParent(player.gameObject.GetComponent<IItemObjectParent>());
-
-       Debug.Log("Interacting with the: " + itemSO.itemName);
-
-   }
-  */
-
+        
     //this allows the item to manage and tell the parent structure where the item belongs to...
     public void SetItemObjectParent(IItemObjectParent itemObjectParent) { // here we tell the item, the structure passed through, is now structure it is attached to
 
@@ -37,6 +27,7 @@ public class Item : MonoBehaviour {
         if (this.itemObjectParent != null) {
             this.itemObjectParent.ClearItem();
         }
+
         //2. here the new parent is assigned to the item
         this.itemObjectParent = itemObjectParent;
 

@@ -5,30 +5,31 @@ using System;
 
 public class SwitchInteractable : MonoBehaviour,IInteractable,IItemObjectParent {
 
-    [SerializeField] private MeshRenderer buttonLightMeshRenderer;
-    [SerializeField] private Material buttonOnMaterial;
-    [SerializeField] private Material buttonOffMaterial;
+   
     [SerializeField] Transform itemHoldLocation;
     private Item item;
-
-    private bool isSwitchOff;
-
+        
     public event EventHandler DoorAccessGranted;
+    public event EventHandler DoorAccessDenied;
+
 
     public void Interact(Player player) {
 
         if (!player.HasItem()) { // check to see if player is holding item. Player not holding item.
 
             GetItem().SetItemObjectParent(player); // this gives the item to the player
+            DoorAccessDenied?.Invoke(this, EventArgs.Empty);
 
         }
         else {  // player is holding item
             if (item == null) { //There is an NO item here on structure
                 if (player.HasItem()) {
-                    if (player.GetItem() is ItemAccessKey) { // this tests for ACCESS KEY here!
+                    if (player.GetItem() is ItemAccessKey) { // this tests for ACCESS KEY here !!!
                         player.GetItem().SetItemObjectParent(this); // this places the item on the structure
-                        DoorAccessGranted?.Invoke(this, EventArgs.Empty);   
-                    }else {
+                        DoorAccessGranted?.Invoke(this, EventArgs.Empty);
+                        Debug.Log("Access Granted.");
+                    }
+                    else {
                         Debug.Log("Wrong key");
                     }
                     
@@ -39,8 +40,8 @@ public class SwitchInteractable : MonoBehaviour,IInteractable,IItemObjectParent 
         }
 
 
-        PushButton();
-        Debug.Log("Button is PUSHED");
+       
+        
 
     }
 
@@ -69,27 +70,8 @@ public class SwitchInteractable : MonoBehaviour,IInteractable,IItemObjectParent 
         return item != null;
     }
 
-    private void SetSwitchColourOff() {
-        buttonLightMeshRenderer.material = buttonOffMaterial;
-    }
+    
 
-    private void SetSwitchColourOn() {
-        buttonLightMeshRenderer.material = buttonOnMaterial;
-    }
-
-    private void ToggleColour() {
-        isSwitchOff = !isSwitchOff;
-        if (isSwitchOff) {
-            SetSwitchColourOff();
-        }
-        else {
-            SetSwitchColourOn();
-        }
-
-    }
-
-    public void PushButton() {
-        ToggleColour();
-    }
+   
 
 }
