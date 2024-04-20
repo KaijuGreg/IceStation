@@ -33,7 +33,9 @@ public class SwitchVisual : MonoBehaviour {
     private void SetSwitchColourOn() {
         buttonLightMeshRenderer.material = buttonOnMaterial;
     }
+    
 
+    //This is not being used...
     private void ToggleColour() {
         isSwitchOff = !isSwitchOff;
         if (isSwitchOff) {
@@ -44,6 +46,7 @@ public class SwitchVisual : MonoBehaviour {
         }
 
     }
+    
 
 
 
