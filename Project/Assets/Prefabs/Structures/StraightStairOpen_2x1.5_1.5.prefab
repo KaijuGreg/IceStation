@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5431932528037439026}
   - component: {fileID: 8336488477488284265}
   - component: {fileID: 3175143580952167735}
+  - component: {fileID: 8177941097209709007}
   m_Layer: 0
   m_Name: StraightStairOpen_2x1.5_1.5
   m_TagString: Untagged
@@ -98,3 +99,16 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -1762502110879761341, guid: d92e3f921b22a854cb57dd40da7e7555, type: 3}
+--- !u!65 &8177941097209709007
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5693728970732806605}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.58, y: 0.22, z: 1.5000013}
+  m_Center: {x: 0.3, y: -0.11, z: -0.75000066}
