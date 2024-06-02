@@ -23,15 +23,6 @@ public class LightSwitchInteractable : MonoBehaviour, IInteractable {
     }
 
 
-    private void TurnOn() {
-        LightSwitchedOn?.Invoke(this, EventArgs.Empty);
-    }
-
-
-    private void TurnOff() {
-        LightSwitchedOff?.Invoke(this, EventArgs.Empty);
-    }
-
     private void ToggleLight() {
         isLightOff = !isLightOff;
         if (isLightOff) {
@@ -41,5 +32,16 @@ public class LightSwitchInteractable : MonoBehaviour, IInteractable {
             TurnOff();
         }
     }
+
+    private void TurnOn() {
+        LightSwitchedOn?.Invoke(this, EventArgs.Empty);
+    }
+
+
+    private void TurnOff() {
+        LightSwitchedOff?.Invoke(this, EventArgs.Empty);
+    }
+
+   
 
 }
