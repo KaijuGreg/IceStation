@@ -266,6 +266,22 @@ namespace StarterAssets
 
 
             Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
+            
+            float avoidFloorDistance = 0.1f;
+            float ladderGrabDistance = 0.4f;
+            if (Physics.Raycast(transform.position + Vector3.up * avoidFloorDistance, targetDirection, out RaycastHit raycastHit, ladderGrabDistance)){
+                //Debug.Log(raycastHit.transform);
+                if (raycastHit.transform.TryGetComponent(out Ladder ladder)) {
+
+                    targetDirection.x = 0f;
+                    targetDirection.y = targetDirection.z;
+                    targetDirection.z = 0f;
+                    _verticalVelocity = 0f;
+                    Grounded = true;
+                }
+
+            };
+                
 
             // move the player
             _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) +
