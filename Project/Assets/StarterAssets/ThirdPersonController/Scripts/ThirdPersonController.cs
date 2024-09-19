@@ -86,6 +86,8 @@ namespace StarterAssets
         private float _rotationVelocity;
         private float _verticalVelocity;
         private float _terminalVelocity = 53.0f;
+        private bool isClimbingLadder;
+        private Vector3 lastGrabLadderDirection;
 
         // timeout deltatime
         private float _jumpTimeoutDelta;
@@ -266,22 +268,65 @@ namespace StarterAssets
 
 
             Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
-            
-            float avoidFloorDistance = 0.1f;
-            float ladderGrabDistance = 0.4f;
-            if (Physics.Raycast(transform.position + Vector3.up * avoidFloorDistance, targetDirection, out RaycastHit raycastHit, ladderGrabDistance)){
-                //Debug.Log(raycastHit.transform);
-                if (raycastHit.transform.TryGetComponent(out Ladder ladder)) {
 
-                    targetDirection.x = 0f;
-                    targetDirection.y = targetDirection.z;
-                    targetDirection.z = 0f;
-                    _verticalVelocity = 0f;
-                    Grounded = true;
+
+            if (!isClimbingLadder) {  // this tests if you are not climbing
+
+                // Not climbing any ladder
+                float avoidFloorDistance = 0.3f;
+                float ladderGrabDistance = 0.6f;
+
+                if (Physics.Raycast(transform.position + Vector3.up * avoidFloorDistance, targetDirection, out RaycastHit raycastHit, ladderGrabDistance)) {
+                    
+                    if (raycastHit.transform.TryGetComponent(out Ladder ladder)) {
+                        GrabLadder(targetDirection);
+                        
+                    }
                 }
 
-            };
+            } else {
+                // we are climbing the ladder
+                float avoidFloorDistance = 0.3f;
+                float ladderGrabDistance = 0.6f;
+
+                // the lastGrabLadderDirection here below points the raycast forward so we can down the ladder and not let go.
+                if (Physics.Raycast(transform.position + Vector3.up * avoidFloorDistance, lastGrabLadderDirection, out RaycastHit raycastHit, ladderGrabDistance)) {
+
+                    if (!raycastHit.transform.TryGetComponent(out Ladder ladder)) {
+                        DropLadder();
+                        _verticalVelocity = 4f; // this is enables the character to jump off a bit at the top of the ladder
+
+
+                    }
+                } else { // there is no Laddere in front so we will let go.
+                    DropLadder();
+                    _verticalVelocity = 4f;
+                }
+
+
+                if(Vector3.Dot(targetDirection, lastGrabLadderDirection) < 0) {
+                    //climbing down the ladder
+                    //Debug.Log("t");
+                    float ladderFloorDropDistance = .1f;
+                    if(Physics.Raycast(transform.position, Vector3.down, out RaycastHit floorRayCastHit, ladderFloorDropDistance)){
+                        DropLadder();
+                    }
+                }
+
                 
+            }
+           
+
+            if (isClimbingLadder) {
+                targetDirection.x = 0f; //stop horizontal movement
+                targetDirection.y = -targetDirection.z; // not sure why my z is opposite, but I put a negative to invert it.
+                targetDirection.z = 0f; //stop forward movement
+                _verticalVelocity = 0f;
+                Grounded = true; // The player is climbing, not grounded.
+                _speed = targetSpeed;
+            }
+
+
 
             // move the player
             _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) +
@@ -294,6 +339,17 @@ namespace StarterAssets
                 _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
             }
         }
+
+
+        private void GrabLadder(Vector3 lastGrabLadderDirection) {
+            isClimbingLadder = true;
+            this.lastGrabLadderDirection = lastGrabLadderDirection;
+        }
+
+        private void DropLadder() {
+            isClimbingLadder = false;
+        }
+
 
         private void JumpAndGravity()
         {
