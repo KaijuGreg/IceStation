@@ -86,6 +86,7 @@ namespace StarterAssets
         private float _rotationVelocity;
         private float _verticalVelocity;
         private float _terminalVelocity = 53.0f;
+
         private bool isClimbingLadder;
         private Vector3 lastGrabLadderDirection;
 
@@ -99,6 +100,10 @@ namespace StarterAssets
         private int _animIDJump;
         private int _animIDFreeFall;
         private int _animIDMotionSpeed;
+
+        private int _animIDClimbUp;
+        private int _animIDClimbDown;
+        private int _animIDIsClimbing;
 
 #if ENABLE_INPUT_SYSTEM 
         private PlayerInput _playerInput;
@@ -175,6 +180,10 @@ namespace StarterAssets
             _animIDJump = Animator.StringToHash("Jump");
             _animIDFreeFall = Animator.StringToHash("FreeFall");
             _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
+
+            _animIDClimbUp = Animator.StringToHash("ClimbUp");
+            _animIDClimbDown = Animator.StringToHash("ClimbDown");
+            _animIDIsClimbing = Animator.StringToHash("isClimbing");
         }
 
         private void GroundedCheck()
@@ -230,6 +239,7 @@ namespace StarterAssets
             float speedOffset = 0.1f;
             float inputMagnitude = _input.analogMovement ? _input.move.magnitude : 1f;
 
+           
             // accelerate or decelerate to target speed
             if (currentHorizontalSpeed < targetSpeed - speedOffset ||
                 currentHorizontalSpeed > targetSpeed + speedOffset)
@@ -251,18 +261,19 @@ namespace StarterAssets
             if (_animationBlend < 0.01f) _animationBlend = 0f;
 
             // normalise input direction
-            Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
+            Vector3 inputDirection = new Vector3(_input.move.x,0.0f, _input.move.y).normalized;
 
             // note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
             // if there is a move input rotate player when the player is moving
-            if (_input.move != Vector2.zero)
+            if (_input.move != Vector2.zero && !isClimbingLadder)
             {
                 _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
                                   _mainCamera.transform.eulerAngles.y;
                 float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
                     RotationSmoothTime);
+               
 
-                // rotate to face input direction relative to camera position
+              // rotate to face input direction relative to camera position
                 transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
             }
 
@@ -285,11 +296,11 @@ namespace StarterAssets
                 }
 
             } else {
-                // we are climbing the ladder
+                // otherwise, we are climbing the ladder
                 float avoidFloorDistance = 0.3f;
                 float ladderGrabDistance = 0.6f;
 
-                // the lastGrabLadderDirection here below points the raycast forward so we can down the ladder and not let go.
+                // the lastGrabLadderDirection here below points the raycast forward so we can down the ladder and not let go of the ladder.
                 if (Physics.Raycast(transform.position + Vector3.up * avoidFloorDistance, lastGrabLadderDirection, out RaycastHit raycastHit, ladderGrabDistance)) {
 
                     if (!raycastHit.transform.TryGetComponent(out Ladder ladder)) {
@@ -298,7 +309,7 @@ namespace StarterAssets
 
 
                     }
-                } else { // there is no Laddere in front so we will let go.
+                } else { // there is no Ladder in front so we will let go.
                     DropLadder();
                     _verticalVelocity = 4f;
                 }
@@ -306,7 +317,7 @@ namespace StarterAssets
 
                 if(Vector3.Dot(targetDirection, lastGrabLadderDirection) < 0) {
                     //climbing down the ladder
-                    //Debug.Log("t");
+                   
                     float ladderFloorDropDistance = .1f;
                     if(Physics.Raycast(transform.position, Vector3.down, out RaycastHit floorRayCastHit, ladderFloorDropDistance)){
                         DropLadder();
@@ -318,13 +329,71 @@ namespace StarterAssets
            
 
             if (isClimbingLadder) {
+
+                // Trigger climbing animation
+                if (_hasAnimator){
+                    // check if the player is moving vertically on the ladder (up or down)
+                    if(_input.move.y != 0) {
+                        _animator.SetBool(_animIDIsClimbing, true); // activate climb animation
+                    } else {
+                        _animator.SetBool(_animIDIsClimbing, false); // stop climbing animation
+                    }
+                   
+                
+                }
+
+
+                //Force the character to face the ladder's direction
+                transform.rotation = Quaternion.LookRotation(lastGrabLadderDirection);
+
                 targetDirection.x = 0f; //stop horizontal movement
-                targetDirection.y = -targetDirection.z; // not sure why my z is opposite, but I put a negative to invert it.
+                
+                targetDirection.y = _input.move.y;
                 targetDirection.z = 0f; //stop forward movement
                 _verticalVelocity = 0f;
-                Grounded = true; // The player is climbing, not grounded.
+                Grounded = true; // The player is considered grounded, ie not jumping or falling
                 _speed = targetSpeed;
-            }
+
+
+
+                // Getting off the top the ladder, Detect when the player reaches the top of the ladder and steps off
+
+                float ladderTopDropDistance = 0.1f; // Distance to check the top of the ladder
+                if (_input.move.y > 0) { // When moving up
+                                         // Raycast upwards to check if the player has reached the top of the ladder
+                    if (Physics.Raycast(transform.position, Vector3.up, out RaycastHit topRayCastHit, ladderTopDropDistance)) {
+                        DropLadder(); // Player has reached the top and should stop climbing
+
+                        if (_hasAnimator) {
+                            _animator.SetBool(_animIDIsClimbing, false); // Deactivate climbing animation
+                        }
+
+
+                    }
+                }
+
+
+
+                // getting off ladder at the bottom when coming down...
+
+                if (_input.move.y < 0) { // when moving down
+
+                    float ladderFloorDropDistance = .1f; // distance to check floor
+                    if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit floorRayCastHit, ladderFloorDropDistance)) {
+                        DropLadder();
+
+                        //now, not climbing, reset the climbing animation
+
+                        if (_hasAnimator) {
+                            _animator.SetBool(_animIDIsClimbing, false); // Deactivate climbing animation
+                        }
+                    }
+
+
+
+                }
+                              
+            } 
 
 
 
